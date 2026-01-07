@@ -4,6 +4,7 @@ import { DEMO_USER_ID } from "@/lib/demo";
 import Card from "@/app/ui/Card";
 import { quarterFromRoute, type QuarterRoute } from "@/lib/quarters";
 import QuarterEntryCard from "./ui/QuarterEntryCard";
+import { ensureDbReady } from "@/lib/dbReady";
 
 function getYearFromSearchParams(searchParams: Record<string, string | string[] | undefined>) {
   const raw = searchParams.year;
@@ -23,6 +24,8 @@ export default async function ReviewPage({
   const year = getYearFromSearchParams(searchParams);
   const quarter = quarterFromRoute(params.quarter);
   if (!quarter) return notFound();
+
+  await ensureDbReady(prisma);
 
   const yearPlan = await prisma.yearPlan.findUnique({
     where: { userId_year: { userId: DEMO_USER_ID, year } },

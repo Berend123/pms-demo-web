@@ -4,6 +4,7 @@ import { DEMO_USER_ID } from "@/lib/demo";
 import type { Quarter } from "@/lib/quarters";
 import { formatPct, safePct, safeVariancePct, statusFromAnnualProgressPct } from "@/lib/calc";
 import ReportActions from "./ui/ReportActions";
+import { ensureDbReady } from "@/lib/dbReady";
 
 function getYearFromSearchParams(searchParams: Record<string, string | string[] | undefined>) {
   const raw = searchParams.year;
@@ -23,6 +24,8 @@ export default async function ReportPage({
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const year = getYearFromSearchParams(searchParams);
+
+  await ensureDbReady(prisma);
 
   const yearPlan = await prisma.yearPlan.findUnique({
     where: { userId_year: { userId: DEMO_USER_ID, year } },

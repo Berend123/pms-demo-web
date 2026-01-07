@@ -4,12 +4,15 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { DEMO_USER_ID, DEMO_USER_NAME } from "@/lib/demo";
+import { ensureDbReady } from "@/lib/dbReady";
 
 function round2(value: number) {
   return Math.round(value * 100) / 100;
 }
 
 async function getOrCreateYearPlan(year: number) {
+  await ensureDbReady(prisma);
+
   await prisma.user.upsert({
     where: { id: DEMO_USER_ID },
     update: { name: DEMO_USER_NAME },
@@ -109,6 +112,7 @@ const deleteSchema = z.object({
 });
 
 export async function deleteIndicator(formData: FormData) {
+  await ensureDbReady(prisma);
   const parsed = deleteSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) return;
 
@@ -128,6 +132,7 @@ const quarterEntrySchema = z.object({
 });
 
 export async function updateQuarterEntry(formData: FormData) {
+  await ensureDbReady(prisma);
   const parsed = quarterEntrySchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) return;
 

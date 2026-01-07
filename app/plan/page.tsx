@@ -4,6 +4,7 @@ import Card from "../ui/Card";
 import AddIndicatorForm from "./ui/AddIndicatorForm";
 import IndicatorEditForm from "./ui/IndicatorEditForm";
 import { deleteIndicator } from "../actions";
+import { ensureDbReady } from "@/lib/dbReady";
 
 function getYearFromSearchParams(searchParams: Record<string, string | string[] | undefined>) {
   const raw = searchParams.year;
@@ -19,6 +20,8 @@ export default async function PlanPage({
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const year = getYearFromSearchParams(searchParams);
+
+  await ensureDbReady(prisma);
 
   const yearPlan = await prisma.yearPlan.findUnique({
     where: { userId_year: { userId: DEMO_USER_ID, year } },
@@ -75,4 +78,3 @@ export default async function PlanPage({
     </div>
   );
 }
-

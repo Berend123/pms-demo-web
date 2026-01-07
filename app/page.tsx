@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { DEMO_USER_ID, DEMO_USER_NAME } from "@/lib/demo";
 import { quarterEndDate, quarterOrder } from "@/lib/quarters";
 import type { Quarter } from "@/lib/quarters";
+import { ensureDbReady } from "@/lib/dbReady";
 
 function getYearFromSearchParams(searchParams: Record<string, string | string[] | undefined>) {
   const raw = searchParams.year;
@@ -29,6 +30,8 @@ export default async function Dashboard({
 }) {
   const year = getYearFromSearchParams(searchParams);
   const now = new Date();
+
+  await ensureDbReady(prisma);
 
   const yearPlan = await prisma.yearPlan.findUnique({
     where: { userId_year: { userId: DEMO_USER_ID, year } },

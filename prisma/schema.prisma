@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  yearPlans YearPlan[]
+}
+
+model YearPlan {
+  id        String      @id @default(cuid())
+  year      Int
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  indicators Indicator[]
+
+  @@unique([userId, year])
+}
+
+model Indicator {
+  id             String       @id @default(cuid())
+  objectiveTitle String
+  indicatorName  String
+  annualTarget   Float
+  unit           String
+  baseline       Float?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  yearPlanId     String
+  yearPlan       YearPlan     @relation(fields: [yearPlanId], references: [id], onDelete: Cascade)
+
+  quarterEntries QuarterEntry[]
+}
+
+model QuarterEntry {
+  id             String   @id @default(cuid())
+  quarter         String
+  quarterlyTarget Float
+  actualAchieved  Float?
+  comments        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  indicatorId     String
+  indicator       Indicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+
+  @@unique([indicatorId, quarter])
+}
